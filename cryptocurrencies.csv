@@ -1,0 +1,51 @@
+,id,name,symbol,rank,is_new,is_active,type
+0,btc-bitcoin,Bitcoin,BTC,1,False,True,coin
+1,eth-ethereum,Ethereum,ETH,2,False,True,coin
+2,usdt-tether,Tether,USDT,3,False,True,token
+3,bnb-binance-coin,Binance Coin,BNB,4,False,True,coin
+4,sol-solana,Solana,SOL,5,False,True,coin
+5,usdc-usd-coin,USDC,USDC,6,False,True,token
+6,xrp-xrp,XRP,XRP,7,False,True,coin
+7,steth-lido-staked-ether,Lido Staked Ether,STETH,8,False,True,token
+8,doge-dogecoin,Dogecoin,DOGE,9,False,True,coin
+9,trx-tron,TRON,TRX,10,False,True,coin
+10,ada-cardano,Cardano,ADA,11,False,True,coin
+11,toncoin-the-open-network,Toncoin,TON,12,False,True,coin
+12,avax-avalanche,Avalanche,AVAX,13,False,True,coin
+13,shib-shiba-inu,Shiba Inu,SHIB,14,False,True,token
+14,wbtc-wrapped-bitcoin,Wrapped Bitcoin,WBTC,15,False,True,token
+15,weth-weth,WETH,WETH,16,False,True,token
+16,link-chainlink,Chainlink,LINK,17,False,True,token
+17,bch-bitcoin-cash,Bitcoin Cash,BCH,18,False,True,coin
+18,dot-polkadot,Polkadot,DOT,19,False,True,coin
+19,dai-dai,Dai,DAI,20,False,True,token
+20,leo-leo-token,LEO Token,LEO,21,False,True,token
+21,sui-sui,Sui,SUI,22,False,True,coin
+22,ltc-litecoin,Litecoin,LTC,23,False,True,coin
+23,apt-aptos,Aptos,APT,24,False,True,coin
+24,btcb-binance-bitcoin,Binance Bitcoin,BTCB,25,False,True,token
+25,near-near-protocol,Near Protocol,NEAR,26,False,True,coin
+26,uni-uniswap,Uniswap,UNI,27,False,True,token
+27,pepe-pepe,Pepe,PEPE,28,False,True,token
+28,icp-internet-computer,Internet Computer,ICP,29,False,True,coin
+29,tao-bittensor,BitTensor,TAO,30,False,True,coin
+30,fetch-ai,Fetch.AI,FET,31,False,True,token
+31,kas-kaspa,Kaspa,KAS,32,False,True,coin
+32,xmr-monero,Monero,XMR,33,False,True,coin
+33,xlm-stellar,Stellar,XLM,34,False,True,coin
+34,etc-ethereum-classic,Ethereum Classic,ETC,35,False,True,coin
+35,stx-stacks,Stacks,STX,36,False,True,coin
+36,wbt-whitebit,WhiteBIT Coin,WBT,37,False,True,coin
+37,fdusd-first-digital-usd,First Digital USD,FDUSD,38,False,True,token
+38,rndr-render-token,Render,RENDER,39,False,True,token
+39,wif-dogwifcoin,dogwifhat,WIF,40,False,True,token
+40,okb-okb,OKB,OKB,41,False,True,token
+41,cre-carry,Carry,CRE,42,False,True,token
+42,aave-new,Aave,AAVE,43,False,True,token
+43,fil-filecoin,Filecoin,FIL,44,False,True,coin
+44,op-optimism,Optimism,OP,45,False,True,token
+45,imx-immutable-x,Immutable X,IMX,46,False,True,token
+46,cro-cryptocom-chain,Cronos,CRO,47,False,True,coin
+47,mnt-mantle,Mantle,MNT,48,False,True,token
+48,pol-polygon-ecosystem-token,Polygon Ecosystem Token,POL,49,False,True,token
+49,jitosol-jito-staked-sol,Jito Staked SOL,JITOSOL,50,False,True,token
