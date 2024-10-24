@@ -1,0 +1,472 @@
+---
+title: "Crypto"
+author: "BAKENGA William"
+date: '2024-10-16'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(ggthemes)
+library(caret)
+library(timeDate)
+library(ggrepel)
+library(readr)
+library(askpass)
+library(class)
+library(forcats)
+library(lubridate)
+library(stringr)
+library(corrplot)
+library(extrafont)
+```
+
+```{r}
+library(systemfonts)
+#fonts()
+#loadfonts()
+```
+
+```{r}
+data = read.csv('C://Users//HP//Documents//william_project_solo//bi-perso//marketprice.csv')
+head(data)
+```
+
+```{r}
+dim(data)
+colnames(data)
+```
+
+
+```{r}
+data$timestamp = str_replace(data$timestamp, "T00:00:00Z", "")
+data$timestamp = as.Date(data$timestamp, tryFormats = "%Y-%m-%d")
+head(data)
+```
+
+# The greatest prices
+
+```{r}
+data %>%
+  dplyr::select(name, price) %>%
+  group_by(name) %>%
+  summarise(prix_moyen = round(mean(price), 3)) %>%
+  ungroup() %>% 
+  mutate(rang = as.integer(rank(desc(prix_moyen)))) %>%
+  dplyr::filter(rang <= 25) %>%
+  arrange(rang)
+```
+
+We have some interesting result but some data wrangling needs to be done at this point since BTC and ETH have each multiple values;
+
+```{r}
+labels = read.csv('C://Users//HP//Documents//william_project_solo//bi-perso//cryptocurrencies.csv')
+head(labels)
+```
+
+
+```{r fig.width=8}
+data %>% dplyr::select(price, timestamp, name) %>%
+  dplyr::filter(name == 'btc-bitcoin') %>%
+  ggplot(aes(x = timestamp, y = price)) +
+  geom_line(linewidth = 1
+            , col = 'lightblue'
+            ) +
+  theme_minimal() +
+  labs(title = "Evolution of the bitcoin price per day"
+       , subtitle = "Since October 2023\n"
+       , caption = "Done by William Bak"
+       , x = "Date"
+       , y = "Price"
+       ) +
+  theme(plot.title = element_text(family = "Times New Roman"
+                                  , vjust = .5
+                                  , face = "bold"
+                                  , color = "grey"
+                                  , size = 14
+                                  )
+        , plot.subtitle = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        , plot.caption = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        )
+  
+```
+
+```{r fig.width=8}
+data %>% dplyr::select(price, timestamp, name) %>%
+  dplyr::filter(name == 'btc-bitcoin') %>%
+  ggplot(aes(price)) +
+  geom_histogram(fill = 'lightblue'
+                 , col = "white"
+                 ) +
+  theme_minimal() +
+  labs(title = "Distribution of the bitcoin price"
+       , subtitle = "Since October 2023\n"
+       , caption = "Done by William Bak"
+       , x = "Price"
+       ) +
+  theme(plot.title = element_text(family = "Times New Roman"
+                                  , vjust = .5
+                                  , face = "bold"
+                                  , color = "grey"
+                                  , size = 14
+                                  )
+        , plot.subtitle = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        , plot.caption = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        )
+  
+```
+
+```{r}
+tbl_ = aggregate(data$price, by = list(data$name), FUN=mean)
+tbl_$x = round(tbl_$x, 2)
+tbl_
+```
+
+```{r}
+tbl_1 = aggregate(data$price, by = list(data$name), FUN=median)
+tbl_1$x = round(tbl_1$x, 2)
+tbl_1
+```
+
+We don't have a clear probability law for the distribution of the bitcoin for this year. We would love to see other aspect like the pourcentage variation within the year and the difference between the mean and each values
+
+```{r}
+head(data, 10)
+```
+
+```{r}
+percentage = function(price) {
+  pourcentage =  1- (mean(price) - sd(price)) / mean(price)
+} 
+```
+
+```{r}
+numbers = data %>%
+  dplyr::select(name, price) %>%
+  group_by(name) %>%
+  summarise(ecart_type = round(sd(price), 3)
+            , moyenne = round(mean(price), 3)
+            , mediane = round(median(price), 3)
+            , p = percentage(price) * 100
+            )
+numbers
+```
+
+
+```{r}
+btc = data[which(data$name == "btc-bitcoin"),]
+```
+
+```{r}
+btc_price = btc$price
+moy = mean(btc_price)
+```
+
+```{r}
+sd(btc_price)
+```
+
+```{r}
+numbers = numbers %>%
+  mutate(rang = row_number(desc(p))) %>%
+  arrange(desc(rang))
+```
+We want to look at the coin with the weakest standard deviation pourcentage which can be use as a criteria to see if the coin has been consistent through the last year. We gonna select the lowest ranked "standard deviation pourcentage". Let's say p < 20%.
+
+
+```{r}
+lowest_sd = numbers %>%
+  dplyr::filter(p <= 20 & rang < 49) 
+
+lowest_sd
+```
+
+```{r}
+data2 = data[data$name %in% lowest_sd$name,]
+head(data2)
+```
+
+```{r fig.height=7}
+data2 %>%
+  dplyr::filter(name %in% c("ltc-litecoin", "xmr-monero", "okb-okb","leo-leo-token")) %>%
+  ggplot(aes(timestamp, price, col = name)) +
+  geom_line() +
+  theme_minimal() + 
+  labs(title = "Evolution of the litecoin, the okb and the xmr coins throught the year"
+       , subtitle = "Since october 2023\n"
+       , caption = "By William Bak"
+       , x = "Date"
+       , y = "Price"
+       ) +
+  theme(plot.title = element_text(family = "Times New Roman"
+                                  , vjust = .5
+                                  , face = "bold"
+                                  , color = "grey"
+                                  , size = 14
+                                  )
+        , plot.subtitle = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        , plot.caption = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        )
+```
+
+```{r fig.height=7}
+data2 %>%
+  dplyr::filter(!(name %in% c("ltc-litecoin", "xmr-monero", "okb-okb", "leo-leo-token", "fdusd-first-digital-usd", "dai-dai", "xrp-xrp"))) %>%
+  ggplot(aes(timestamp, price, col = name)) +
+  geom_line() +
+  theme_minimal() + 
+  labs(title = "Evolution of the litecoin, the okb and the xmr coins throught the year"
+       , subtitle = "Since october 2023\n"
+       , caption = "By William Bak"
+       , x = "Date"
+       , y = "Price"
+       ) +
+  theme(plot.title = element_text(family = "Times New Roman"
+                                  , vjust = .5
+                                  , face = "bold"
+                                  , color = "grey"
+                                  , size = 14
+                                  )
+        , plot.subtitle = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        , plot.caption = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        )
+```
+
+TRX seems like a great coin to invest in going forward we gonna try to predict the future values, just like XMR
+
+```{r}
+library(timeSeries)
+```
+
+```{r}
+trx_data = data[data["name"] == 'trx-tron',]
+trx_data
+```
+```{r}
+library(tseries)
+library(timeSeries)
+```
+
+
+```{r fig.width=8}
+data %>% dplyr::select(price, timestamp, name) %>%
+  dplyr::filter(name == 'trx-tron') %>%
+  ggplot(aes(price)) +
+  geom_histogram(fill = 'lightblue'
+                 , col = "white"
+                 ) +
+  theme_minimal() +
+  labs(title = "Distribution of trx price"
+       , subtitle = "Since October 2023\n"
+       , caption = "Done by William Bak"
+       , x = "Price"
+       ) +
+  theme(plot.title = element_text(family = "Times New Roman"
+                                  , vjust = .5
+                                  , face = "bold"
+                                  , color = "grey"
+                                  , size = 14
+                                  )
+        , plot.subtitle = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        , plot.caption = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        )
+  
+```
+
+```{r}
+shapiro.test(trx_prices)
+ks.test(trx_prices, "punif")
+n =length(trx_prices)
+ks.test(trx_prices, "pnorm", 0, 1)
+
+library(triangle)
+ks.test(trx_prices, "pbinom", prob = 0.25, size = 363)
+```
+
+
+```{r fig.width=8}
+data %>% dplyr::select(market_cap, timestamp, name) %>%
+  dplyr::filter(name == 'trx-tron') %>%
+  ggplot(aes(x = timestamp, y = market_cap)) +
+  geom_line(linewidth = 1
+            , col = 'lightblue'
+            ) +
+  theme_minimal() +
+  labs(title = "Evolution of the trx marketcap per day"
+       , subtitle = "Since October 2023\n"
+       , caption = "Done by William Bak"
+       , x = "Date"
+       , y = "Price"
+       ) +
+  theme(plot.title = element_text(family = "Times New Roman"
+                                  , vjust = .5
+                                  , face = "bold"
+                                  , color = "grey"
+                                  , size = 14
+                                  )
+        , plot.subtitle = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        , plot.caption = element_text(family = 'Calibri Light'
+                                       , size = 12
+                                       )
+        )
+  
+```
+
+```{r}
+model1 =lm(price ~ timestamp + market_cap, data = trx_data)
+summary(model1)
+```
+That means that if we can predict the market cap in an efficient way we can predict the trx coin with a linear model. Let's try a generalized linear model in order to find the market cap
+
+```{r}
+model2 = glm(market_cap ~ timestamp, data = trx_data,  family = "poisson")
+summary(model2)
+library(Metrics)
+```
+
+```{r}
+mae1 = mae(trx_data$market_cap, model2$fitted.values)
+mae1
+pred_actual = cbind(trx_data$market_cap, model2$fitted.values)
+```
+
+
+```{r}
+ts.plot(trx_data$market_cap, col = "black", main = "Prévision du market cap")
+lines(model2$fitted.values, col = "blue")
+```
+
+## Essaie des KNN par regression
+
+```{r}
+library(MASS)
+library(FNN)
+```
+
+```{r}
+marketcap1 = trx_data[c("market_cap", "timestamp")]
+marketcap1$timestamp = as.numeric(marketcap1$timestamp) 
+```
+
+```{r}
+indice_train_x = sample(1:nrow(marketcap1), nrow(marketcap1) * 2 / 3, replace = T)
+train_x = marketcap1[indice_train_x, "timestamp"]
+test_x = marketcap1[-indice_train_x, "timestamp"]
+train_y = marketcap1[indice_train_x, "market_cap"]
+
+```
+
+
+```{r}
+model3 = knn.reg(train = as.data.frame(train_x), test = as.data.frame(test_x), y = train_y, k = 12)
+```
+
+
+```{r}
+df_pred1 = marketcap1[-indice_train_x, ]
+df_pred1$prediction = model3$pred
+head(df_pred1, 20)
+```
+
+###     Next days predictions
+
+```{r}
+max(data$timestamp)
+trx_data[trx_data$timestamp == max(trx_data$timestamp), ]
+```
+
+```{r}
+new_timestamp = as.Date(c("2024-10-16","2024-10-17","2024-10-18","2024-10-19","2024-10-20","2024-10-21","2024-10-22","2024-10-23","2024-10-24"))
+new_timestamp
+new_data = data.frame(as.numeric(new_timestamp))
+```
+
+Since predict could not work with a `knnReg` object we will use a naive method and using all the dataset as a training set
+```{r}
+train_x =  marketcap1[, "timestamp"]
+train_y =  marketcap1[, "market_cap"]
+
+model4 = knn.reg(train = as.data.frame(train_x), test = new_data, y = train_y, k = 12)
+model4$pred
+```
+
+```{r}
+lm_model = lm(price ~ timestamp + market_cap, data = trx_data)
+summary(lm_model)
+```
+
+```{r}
+ts.plot(trx_data$price, col = "black", main = "Prévision du market cap")
+lines(lm_model$fitted.values, col = "blue")
+```
+
+```{r}
+new_timestamp = as.Date(c("2024-10-16","2024-10-17","2024-10-18","2024-10-19","2024-10-20","2024-10-21","2024-10-22","2024-10-23","2024-10-24"))
+new_timestamp
+new_data = data.frame(new_timestamp)
+```
+
+```{r}
+new_data$market_cap = model4$pred
+colnames(new_data)[1] = "timestamp"
+predict(lm_model, new_data)
+```
+
+### With the glm response
+
+```{r}
+prediction = predict(model2, new_data, type = "response")
+```
+
+
+```{r}
+new_data2 = data.frame(new_timestamp)
+colnames(new_data2)[1] = "timestamp"
+new_data2$market_cap = prediction
+predict(lm_model, new_data2)
+```
+
+
+```{r}
+view(trx_data)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
