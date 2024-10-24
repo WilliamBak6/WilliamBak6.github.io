@@ -15,3 +15,4 @@ Those limitations gave me some trouble. The second one made me pull the first 50
 ### Little exploration
 
 ![image](https://github.com/WilliamBak6/WilliamBak6.github.io/tree/first_branch/biwillads/bitcoin.png)
+![bitcoin](https://github.com/user-attachments/assets/517957e9-c4c7-4b8c-bbe7-97a0e7112d0c)
