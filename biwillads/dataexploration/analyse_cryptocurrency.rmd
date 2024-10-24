@@ -1,12 +1,14 @@
 ---
 title: "Crypto"
 author: "BAKENGA William"
-date: '2024-10-16'
-output: html_document
+date: "2024-10-16"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = F)
 ```
 
 ```{r}
@@ -231,7 +233,7 @@ data2 %>%
   ggplot(aes(timestamp, price, col = name)) +
   geom_line() +
   theme_minimal() + 
-  labs(title = "Evolution of the litecoin, the okb and the xmr coins throught the year"
+  labs(title = "Evolution of the trx and xmr coins throught the year"
        , subtitle = "Since october 2023\n"
        , caption = "By William Bak"
        , x = "Date"
@@ -260,7 +262,6 @@ library(timeSeries)
 
 ```{r}
 trx_data = data[data["name"] == 'trx-tron',]
-trx_data
 ```
 ```{r}
 library(tseries)
@@ -295,16 +296,6 @@ data %>% dplyr::select(price, timestamp, name) %>%
                                        )
         )
   
-```
-
-```{r}
-shapiro.test(trx_prices)
-ks.test(trx_prices, "punif")
-n =length(trx_prices)
-ks.test(trx_prices, "pnorm", 0, 1)
-
-library(triangle)
-ks.test(trx_prices, "pbinom", prob = 0.25, size = 363)
 ```
 
 
@@ -452,10 +443,6 @@ new_data2$market_cap = prediction
 predict(lm_model, new_data2)
 ```
 
-
-```{r}
-view(trx_data)
-```
 
 ```{r}
 
